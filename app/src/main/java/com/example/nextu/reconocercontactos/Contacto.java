@@ -1,7 +1,7 @@
 package com.example.nextu.reconocercontactos;
 
 /**
- * Created by Next University
+ * Clase encargada de extraer los elementos del dispositivo
  */
 public class Contacto {
 

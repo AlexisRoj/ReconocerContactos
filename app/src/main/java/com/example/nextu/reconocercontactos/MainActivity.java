@@ -9,12 +9,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
+
 
 import java.util.ArrayList;
 
@@ -61,21 +58,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }).start();
 
-
-       /* mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-                //TODO Do whatever you want with the list data
-                Toast.makeText(getApplicationContext(), "item seleccionado: \n" + contactList.get(position), Toast.LENGTH_SHORT).show();
-            }
-        });*/
     }
 
+    /**
+     * Clase encargada de extraer los contactos del telefono
+     * */
     public void getContacts() {
-        String phoneNumber = null;
-        String email= null;
+        String phoneNumber;
+        String email;
         Uri CONTENT_URI= ContactsContract.Contacts.CONTENT_URI;
         String _ID = ContactsContract.Contacts._ID;
         String DISPLAY_NAME = ContactsContract.Contacts.DISPLAY_NAME;
@@ -85,15 +75,15 @@ public class MainActivity extends AppCompatActivity {
         String Phone_CONTAC_ID =ContactsContract.CommonDataKinds.Phone.CONTACT_ID;
         String NUMBER =ContactsContract.CommonDataKinds.Phone.NUMBER;
         Uri emailCONTENT_URI = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
-        String emailCONTAC_ID =ContactsContract.CommonDataKinds.Phone.CONTACT_ID;
+       // String emailCONTAC_ID =ContactsContract.CommonDataKinds.Phone.CONTACT_ID;
         String data =ContactsContract.CommonDataKinds.Phone.DATA;
 
-        StringBuffer output;
+        //StringBuffer output;
 
         ContentResolver contentResolver = getContentResolver();
 
+        //Incializa el cursor
         cursor = contentResolver.query(CONTENT_URI,null,null,null,null);
-
 
         if(cursor.getCount()>0) {
 
@@ -111,42 +101,51 @@ public class MainActivity extends AppCompatActivity {
                 });
                 String contact_id = cursor.getString(cursor.getColumnIndex(_ID));
                 String name = cursor.getString(cursor.getColumnIndex(DISPLAY_NAME));
-                int hasPhoneNumber = Integer.parseInt(cursor.getString(cursor.getColumnIndex(HAS_PHONE_NUMBER)));
+                int hasPhoneNumber = Integer.parseInt
+                        (cursor.getString(cursor.getColumnIndex(HAS_PHONE_NUMBER)));
 
                 if (hasPhoneNumber > 0) {
                     nombre = name;
-                    Cursor phoneCursor = contentResolver.query(PhoneCONTENT_URI, null, Phone_CONTAC_ID + "=?", new String[]{contact_id}, null);
 
+                    Cursor phoneCursor = contentResolver.query
+                            (PhoneCONTENT_URI, null, Phone_CONTAC_ID + "=?",
+                                    new String[]{contact_id}, null);
 
+                    /**
+                     * Extrae el número
+                     * */
                     while (phoneCursor.moveToNext()) {
-
                         phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndex(NUMBER));
                         numero = phoneNumber;
-
                     }
                     phoneCursor.close();
-                    Cursor emailCursor = contentResolver.query(emailCONTENT_URI, null, Phone_CONTAC_ID + "=?", new String[]{contact_id}, null);
+                    /**
+                     * Extrae el email
+                     * */
+
+                    Cursor emailCursor = contentResolver.query
+                            (emailCONTENT_URI, null, Phone_CONTAC_ID + "=?"
+                                    , new String[]{contact_id}, null);
 
                     while (emailCursor.moveToNext()) {
-
                         email = emailCursor.getString(emailCursor.getColumnIndex(data));
                         correo = email;
-
                     }
                     emailCursor.close();
 
                 }
-
-
+                //Crea la lista de contactos
                 contactList.add(new Contacto(nombre, numero, correo));
             }
 
 
+
             runOnUiThread(new Runnable() {
+                /** Inicializa el hilo y carga el adapter*/
                 @Override
                 public void run() {
-                    Adapter ad = new Adapter(MainActivity.this, contactList);
-                    mListView.setAdapter(ad);
+                    Adapter adapter = new Adapter(MainActivity.this, contactList);
+                    mListView.setAdapter(adapter);
                 }
             });
 
@@ -156,9 +155,6 @@ public class MainActivity extends AppCompatActivity {
                     pDialog.cancel();
                 }
             }, 500);
-
-
-
 
         }
 
