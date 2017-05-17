@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        //Pide los permisos
         int leer = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
         if (leer == PackageManager.PERMISSION_DENIED) {
             ActivityCompat.requestPermissions(this, PERMISOS, REQUEST_CODE);
